@@ -1,0 +1,41 @@
+name: open-web-ollama
+
+services:
+  open-webui:
+    container_name: open-webui
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    ports:
+      - 3000:8080
+    volumes:
+      - open-webui:/app/backend/data
+    environment:
+      - WEBUI_AUTH=${WEBUI_AUTH:-False}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      - OPENAI_API_BASE_URL=${OPENAI_API_BASE_URL:-https://openrouter.com/api/v1}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    labels:
+      tsdproxy.enable: true
+      tsdproxy.funnel: true
+      tsdproxy.name: open-webui
+      tsdproxy.container_port: 3000
+      tsdproxy.dash.icon: "sh/open-webui-light"
+
+  tsdproxy:
+    image: almeidapaulopt/tsdproxy:1
+    container_name: tsdproxy
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID:-1000}
+      - PGID=${PGID:-1000}
+      - TS_AUTHKEY=${TS_AUTHKEY:-}
+    ports:
+      - 8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./tsdproxy/data:/data
+      - ./tsdproxy/config:/config
+
+volumes:
+  open-webui:
+    name: open-webui
