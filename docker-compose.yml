@@ -1,4 +1,4 @@
-name: open-web-ollama
+name: ai-playground
 
 services:
   open-webui:
@@ -39,3 +39,4 @@ services:
 volumes:
   open-webui:
     name: open-webui
+    external: true
